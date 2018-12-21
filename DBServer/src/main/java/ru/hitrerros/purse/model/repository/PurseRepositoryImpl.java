@@ -14,6 +14,7 @@ import java.util.List;
 public class PurseRepositoryImpl implements PurseRepository {
 
     private static final String GET_BETWEEN_QUERY = "SELECT r FROM record WHERE r.tr_date BETWEEN :startDate AND :endDate";
+    private static final String GET_ALL = "SELECT * FROM record";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -51,5 +52,10 @@ public class PurseRepositoryImpl implements PurseRepository {
         return entityManager.createNamedQuery(GET_BETWEEN_QUERY, PurseEntity.class)
                 .setParameter("startDate", from)
                 .setParameter("endDate", to).getResultList();
+    }
+
+    @Override
+    public List<PurseEntity> getAll() {
+        return entityManager.createNamedQuery(GET_ALL, PurseEntity.class).getResultList();
     }
 }

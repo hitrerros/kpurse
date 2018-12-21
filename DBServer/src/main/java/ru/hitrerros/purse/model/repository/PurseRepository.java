@@ -13,6 +13,9 @@ public interface PurseRepository {
 
     List<PurseEntity> getRangeOfRecords(LocalDate from, LocalDate to);
 
+    List<PurseEntity> getAll();
+
+
     void deleteRecord(PurseEntity record);
 
 }

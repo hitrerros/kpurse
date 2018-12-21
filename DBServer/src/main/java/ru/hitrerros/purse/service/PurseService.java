@@ -15,4 +15,6 @@ public interface PurseService {
 
     List<PurseEntity> getRangeOfRecords(LocalDate from, LocalDate to);
 
+    List<PurseEntity> getAll();
+
 }
