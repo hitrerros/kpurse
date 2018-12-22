@@ -22,8 +22,7 @@ public class PurseRepositoryImpl implements PurseRepository {
 
     @Override
     public PurseEntity getRecord(long id) {
-        PurseEntity entity = entityManager.find(PurseEntity.class, id);
-        return entity;
+        return entityManager.find(PurseEntity.class, id);
     }
 
     @Override

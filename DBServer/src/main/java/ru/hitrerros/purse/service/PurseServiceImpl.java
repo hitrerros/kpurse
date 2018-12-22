@@ -35,7 +35,10 @@ public class PurseServiceImpl implements PurseService {
         return repository.getRangeOfRecords(from,to);
     }
 
-
+    @Override
+    public List<PurseEntity> getAll() {
+        return repository.getAll();
+    }
 
 
 }

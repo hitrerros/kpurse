@@ -4,6 +4,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
 
 
 @SuppressWarnings("SameParameterValue")
@@ -11,7 +13,7 @@ public  class ReflectionHelper {
     private ReflectionHelper() {
     }
 
-    public static <T> T instantiate(Class<T> type, Object... args) {
+    private static <T> T instantiate(Class<T> type, Object... args) {
         try {
             if (args.length == 0) {
                 return type.getDeclaredConstructor().newInstance();
@@ -26,7 +28,7 @@ public  class ReflectionHelper {
         return null;
     }
 
-    public  static Object getFieldValue(Object object, String name) {
+    private static Object getFieldValue(Object object, String name) {
         Field field = null;
         boolean isAccessible = true;
         try {
@@ -34,17 +36,23 @@ public  class ReflectionHelper {
             isAccessible = field.canAccess(object);
             field.setAccessible(true);
             return field.get(object);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
-        } finally {
-            if (field != null && !isAccessible) {
-                field.setAccessible(false);
-            }
+        } catch (NoSuchFieldException e) {
+
+            try {
+                field = object.getClass().getSuperclass().getDeclaredField(name); //getField() for public fields
+                field.setAccessible(true);
+                return field.get(object);
+            } catch (NoSuchFieldException | IllegalAccessException n) {
+                e.printStackTrace();
+            } finally {
+                       }
         }
         return null;
     }
 
-    public static void setFieldValue(Object object, String name, Object value) {
+    private static void setFieldValue(Object object, String name, Object value) {
         Field field = null;
         boolean isAccessible = true;
         try {
@@ -52,8 +60,19 @@ public  class ReflectionHelper {
             isAccessible = field.canAccess(object);
             field.setAccessible(true);
             field.set(object, value);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
+        } catch (NoSuchFieldException n) {
+
+            try {
+                field = object.getClass().getSuperclass().getDeclaredField(name); //getField() for public fields
+                field.setAccessible(true);
+                field.set(object, value);
+            } catch (NoSuchFieldException | IllegalAccessException x) {
+                x.printStackTrace();
+            }
+
+
         } finally {
             if (field != null && !isAccessible) {
                 field.setAccessible(false);
@@ -82,4 +101,20 @@ public  class ReflectionHelper {
     static private Class<?>[] toClasses(Object[] args) {
         return Arrays.stream(args).map(Object::getClass).toArray(Class<?>[]::new);
     }
+
+
+    public static  <T,R>  T transferObject(R sourceObject,Class<T> clazz) {
+
+        @SuppressWarnings("unchecked")
+        T newDoc = ReflectionHelper.instantiate(clazz);
+
+        for (Field field : sourceObject.getClass().getDeclaredFields()) {
+            Optional<Object> value = Optional.of(ReflectionHelper.getFieldValue(sourceObject,field.getName()));
+            value.ifPresent(v->ReflectionHelper.setFieldValue(Objects.requireNonNull(newDoc),field.getName(),v));
+        }
+
+        return newDoc;
+    }
+
+
 }

@@ -12,7 +12,8 @@ import ru.hitrerros.purse.clientcommons.SocketClientAgent;
 import ru.hitrerros.purse.model.PurseEntity;
 import ru.hitrerros.purse.service.PurseService;
 import ru.hitrerros.purse.service.PurseServiceImpl;
-import ru.hitrerros.purse.util.DocumentProcessHelper;
+
+import ru.hitrerros.purse.utils.ReflectionHelper;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -79,24 +80,26 @@ public class ServerRequestProcessor {
                 generateReadReply(incomingMessage, replyMessage);
                 break;
             case CREATE:
-
+                generateCreateReply(incomingMessage, replyMessage);
+                break;
             case UPDATE:
-
+                // TODO
             case DELETE:
+                // TODO
         }
 
         return replyMessage;
 
     }
 
-    private void generateReadReply(CRUDMessage incomingMessage, DBReplyMessage replyMessage) {
+    private void  generateReadReply(CRUDMessage incomingMessage, DBReplyMessage replyMessage) {
 
         Document doc = incomingMessage.getDocument();
 
         if (doc.getId() != 0) {
             Optional<PurseEntity> entity = Optional.of(purseService.getRecord(doc.getId()));
             entity.ifPresentOrElse(s -> replyMessage
-                            .setDocuments(List.of(DocumentProcessHelper.copyEntityToDocument(entity.get()))),
+                            .setDocuments(List.of(ReflectionHelper.transferObject(entity.get(),Document.class))),
                     () -> replyMessage.setReturnCode(ReturnCode.NOT_FOUND));
         } else {
             List<PurseEntity> entities = purseService.getAll();
@@ -104,13 +107,31 @@ public class ServerRequestProcessor {
                 replyMessage.setReturnCode(ReturnCode.NOT_FOUND);
             } else {
                 List<Document> docs = entities.stream()
-                        .map(DocumentProcessHelper::copyEntityToDocument)
+                        .map(s-> ReflectionHelper.transferObject(s,Document.class))
                         .collect(Collectors.toList());
 
                 replyMessage.setDocuments(docs);
 
             }
         }
+    }
+
+    private void  generateCreateReply(CRUDMessage incomingMessage, DBReplyMessage replyMessage) {
+
+        PurseEntity entity = ReflectionHelper.transferObject(incomingMessage.getDocument(),PurseEntity.class);
+        PurseEntity respondEntity = purseService.saveRecord(entity);
+
+        if (respondEntity != null) {
+            replyMessage.setDocuments(List.of(ReflectionHelper.transferObject(entity, Document.class)));
+            replyMessage.setReturnCode(ReturnCode.OK_SAVE);
+        }
+        else {
+            replyMessage.setReturnCode(ReturnCode.NOT_FOUND);
+        }
+
+
+
+
     }
 
 }

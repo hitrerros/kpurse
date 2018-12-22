@@ -11,7 +11,7 @@ public class Document {
     private long id;
 
     @JsonProperty("trans_date")
-    private LocalDateTime localDateTime;
+    private LocalDateTime transDate;
 
     @JsonProperty("amount")
     private BigDecimal amount;
@@ -26,7 +26,7 @@ public class Document {
     }
 
     public LocalDateTime getLocalDateTime() {
-        return localDateTime;
+        return transDate;
     }
 
     public BigDecimal getAmount() {
@@ -42,7 +42,7 @@ public class Document {
     }
 
     public void setLocalDateTime(LocalDateTime localDateTime) {
-        this.localDateTime = localDateTime;
+        this.transDate = localDateTime;
     }
 
     public void setAmount(BigDecimal amount) {
