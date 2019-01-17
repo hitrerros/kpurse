@@ -20,7 +20,7 @@ public class MainController {
 
         ServletContext context = request.getServletContext();
 
-        ModelAndView modelAndView = new ModelAndView("main_window");
+        ModelAndView modelAndView = new ModelAndView("main");
 //        modelAndView.addObject("message", "Hello Spring MVC Framework!");
         return modelAndView;
     }
@@ -30,6 +30,7 @@ public class MainController {
     @MessageMapping("/endpoint")
     @SendTo("/purse/processor")
     public ServerMessage send(ClientMessage message) throws Exception {
+        System.out.println("done!");
         return new ServerMessage();
      }
 

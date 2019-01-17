@@ -18,7 +18,7 @@ public class FrontendMain {
 
         WebAppContext webContext = new WebAppContext();
         webContext.setResourceBase(PUBLIC_HTML);
-        webContext.setContextPath("/");
+        webContext.setContextPath("/purse");
         webContext.setDescriptor(WEBXML_PATH );
 
         server.setHandler(webContext);

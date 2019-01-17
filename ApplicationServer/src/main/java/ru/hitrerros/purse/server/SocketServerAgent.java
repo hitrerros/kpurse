@@ -75,12 +75,6 @@ public class SocketServerAgent {
         }
     }
 
-//    private static ByteBuffer messageWrapper(Message message) throws Exception {
-//        String json = MAPPER.writeValueAsString(message);
-//        ByteBuffer buf = ByteBuffer.wrap(json.getBytes());
-//        return buf;
-//    }
-
     private void registerClient(Selector selector, ServerSocketChannel serverSocket)
             throws IOException {
 
